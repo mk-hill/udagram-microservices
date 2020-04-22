@@ -8,6 +8,7 @@ export const config = {
     aws_region: process.env.UDAGRAM_AWS_REGION,
     aws_profile: process.env.UDAGRAM_AWS_PROFILE,
     aws_media_bucket: process.env.UDAGRAM_AWS_MEDIA_BUCKET,
+    image_filter_url: process.env.UDAGRAM_IMAGE_FILTER_URL ?? 'http://localhost:8082',
   },
   prod: {
     username: '',

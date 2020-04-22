@@ -1,7 +1,10 @@
 import { Router, Request, Response } from 'express';
+import axios from 'axios';
 import { FeedItem } from '../models/FeedItem';
 import { requireAuth } from '../../users/routes/auth.router';
 import * as AWS from '../../../../aws';
+import { config } from '../../../../config/config';
+const c = config.dev;
 
 const router: Router = Router();
 
@@ -72,10 +75,11 @@ router.get('/signed-url/:fileName', requireAuth, async (req: Request, res: Respo
 
 // Post meta data and the filename after a file is uploaded
 // NOTE the file name is they key name in the s3 bucket.
-// body : {caption: string, fileName: string};
-router.post('/', requireAuth, async (req: Request, res: Response) => {
-  const caption = req.body.caption;
-  const fileName = req.body.url;
+// User can request filtered version to be saved instead of original
+// body : {caption: string, fileName: string, filter?: boolean};
+router.post('/', async (req: Request, res: Response) => {
+  const { caption, filter } = req.body;
+  let { url: filePath } = req.body;
 
   // check Caption is valid
   if (!caption) {
@@ -83,13 +87,23 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   }
 
   // check Filename is valid
-  if (!fileName) {
+  if (!filePath) {
     return res.status(400).send({ message: 'File url is required' });
+  }
+
+  if (filter) {
+    filePath = await axios
+      .post(`${c.image_filter_url}/filteredimage?image_url=${filePath}`)
+      .then(({ data: filteredPath }) => filteredPath)
+      .catch((e) => {
+        console.error(e);
+        res.status(500).send('Unable to filter image');
+      });
   }
 
   const item = await new FeedItem({
     caption: caption,
-    url: fileName,
+    url: filePath,
   });
 
   const saved_item = await item.save();
