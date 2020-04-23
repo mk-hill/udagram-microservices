@@ -92,13 +92,14 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   if (filter) {
-    filePath = await axios
-      .post(`${c.image_filter_url}/filteredimage?image_url=${filePath}`)
-      .then(({ data: filteredPath }) => filteredPath)
-      .catch((e) => {
-        console.error(e);
-        res.status(500).send('Unable to filter image');
-      });
+    try {
+      filePath = await axios
+        .post(`${c.image_filter_url}/filteredimage?image_url=${filePath}`)
+        .then(({ data: filteredPath }) => filteredPath);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).send('Unable to filter image');
+    }
   }
 
   const item = await new FeedItem({
