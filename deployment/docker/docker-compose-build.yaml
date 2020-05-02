@@ -1,0 +1,22 @@
+version: '3'
+services:
+  reverseproxy:
+    build:
+      context: .
+    image: mkhill/reverseproxy
+  backend-user:
+    build:
+      context: ../../user
+    image: mkhill/udagram-user
+  backend-feed:
+    build:
+      context: ../../feed
+    image: mkhill/udagram-feed
+  backend-filter:
+    build:
+      context: ../../filter
+    image: mkhill/udagram-filter
+  frontend:
+    build:
+      context: ../../frontend
+    image: mkhill/udagram-frontend:local

@@ -9,7 +9,7 @@ import { handleErrorResponse, requireImageUrl } from './validation';
   const app = express();
 
   // Set the network port
-  const port = process.env.PORT || 8082;
+  const port = process.env.PORT || 8080;
 
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
@@ -21,7 +21,7 @@ import { handleErrorResponse, requireImageUrl } from './validation';
    * Send filtered image in response
    * Delete local file
    */
-  app.get('/filteredimage', requireImageUrl, async (req: Request, res: Response) => {
+  app.get('/api/v0/filteredimage', requireImageUrl, async (req: Request, res: Response) => {
     const { image_url: url } = req.query as { image_url: string };
 
     try {
@@ -41,7 +41,7 @@ import { handleErrorResponse, requireImageUrl } from './validation';
    * Delete local file
    * Return filtered image's path in bucket
    */
-  app.post('/filteredimage', requireImageUrl, async (req: Request, res: Response) => {
+  app.post('/api/v0/filteredimage', requireImageUrl, async (req: Request, res: Response) => {
     const { image_url: bucketPathOriginal } = req.query as { image_url: string };
 
     try {
@@ -58,7 +58,7 @@ import { handleErrorResponse, requireImageUrl } from './validation';
   // Root Endpoint
   // Displays a simple message to the user
   app.get('/', async (req, res) => {
-    res.send('try GET /filteredimage?image_url={{}}');
+    res.send('try GET /api/v0/filteredimage?image_url={{}}');
   });
 
   // Start the Server
