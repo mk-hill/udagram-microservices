@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: backend-user
+  name: backend-user
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: backend-user
+    spec:
+      containers:
+        - image: mkhill/udagram-user
+          name: backend-user
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '250m'
+            limits:
+              memory: '1024Mi'
+              cpu: '500m'
+          env:
+            - name: URL
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: URL
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: JWT_SECRET
+            - name: UDAGRAM_DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_DB_DATABASE
+            - name: UDAGRAM_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_DB_HOST
+            - name: UDAGRAM_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: env-secret
+                  key: UDAGRAM_DB_PASSWORD
+            - name: UDAGRAM_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: env-secret
+                  key: UDAGRAM_DB_USERNAME
+      restartPolicy: Always

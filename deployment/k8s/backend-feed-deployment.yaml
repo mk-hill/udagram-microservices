@@ -1,0 +1,79 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: backend-feed
+  name: backend-feed
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: backend-feed
+    spec:
+      containers:
+        - image: mkhill/udagram-feed
+          name: backend-feed
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '250m'
+            limits:
+              memory: '2048Mi'
+              cpu: '500m'
+          env:
+            - name: URL
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: URL
+            - name: UDAGRAM_AWS_MEDIA_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_AWS_MEDIA_BUCKET
+            - name: UDAGRAM_AWS_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_AWS_PROFILE
+            - name: UDAGRAM_AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_AWS_REGION
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: JWT_SECRET
+            - name: UDAGRAM_DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_DB_DATABASE
+            - name: UDAGRAM_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: UDAGRAM_DB_HOST
+            - name: UDAGRAM_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: env-secret
+                  key: UDAGRAM_DB_PASSWORD
+            - name: UDAGRAM_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: env-secret
+                  key: UDAGRAM_DB_USERNAME
+          volumeMounts:
+            - name: aws-secret
+              mountPath: '/root/.aws/'
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: aws-secret
+          secret:
+            secretName: aws-secret

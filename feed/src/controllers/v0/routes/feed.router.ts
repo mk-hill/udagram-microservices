@@ -112,17 +112,6 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(400).send({ message: 'File url is required' });
   }
 
-  if (filter) {
-    try {
-      filePath = await axios
-        .post(`${c.dev.image_filter_url}/filteredimage?image_url=${filePath}`)
-        .then(({ data: filteredPath }) => filteredPath);
-    } catch (e) {
-      console.error(e);
-      return res.status(500).send('Unable to filter image');
-    }
-  }
-
   const item = await new FeedItem({
     caption: caption,
     url: filePath,

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  UDAGRAM_AWS_MEDIA_BUCKET: udagramhilldev
+  UDAGRAM_AWS_PROFILE: default
+  UDAGRAM_AWS_REGION: us-east-1
+  JWT_SECRET: aliens12345
+  UDAGRAM_DB_DATABASE: udagramdev
+  UDAGRAM_DB_HOST: udagramdev.cizscqp7ondi.us-east-1.rds.amazonaws.com
+  UDAGRAM_IMAGE_FILTER_URL: http://localhost:8080
+  URL: http://localhost:8100
+metadata:
+  name: env-config
