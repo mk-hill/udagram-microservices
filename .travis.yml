@@ -12,17 +12,32 @@ services:
 
 # Pre-testing installs
 install:
-  - echo "nothing needs to be installed"
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" # install aws cli
+  - unzip awscliv2.zip # install aws cli
+  - sudo ./aws/install # install aws cli
+  - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl # install kubectl
+  - chmod +x ./kubectl # install kubectl
+  - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin # install kubectl
+  - chmod +x ./deployment/aws-setup.sh # create aws credentials file
+  - ./deployment/aws-setup.sh # create aws credentials file
+  - curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/aws-iam-authenticator # set up iam authenticator
+  - chmod +x ./aws-iam-authenticator # set up iam authenticator
+  - mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin # set up iam authenticator
+  - echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc # set up iam authenticator
 
 # Scripts to be run such as tests
 before_script:
-  - echo "no tests"
+  - docker --version # print the version for logging
+  - aws --version
+  - kubectl version --short --client
 
 script:
-  - docker --version # print the version for logging
-  - npm run build
+  - aws eks --region $AWS_REGION update-kubeconfig --name udagram-eks-cluster # set up kubeconfig
+  - npm run build # build docker images
 
 # Tasks to perform after the process is successful. Formatting the Docker username and password as below enables you to programmatically log in without having the password exposed in logs.
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - npm run push
+  - npm run push # push images to docker hub
+  - npm run apply-deployments # apply deployment files
+  - npm run rollout # rollout deployments

@@ -6,7 +6,9 @@
   "scripts": {
     "build": "docker-compose -f ./deployment/docker/docker-compose-build.yaml build --parallel",
     "start": "docker-compose -f ./deployment/docker/docker-compose.yaml up",
-    "push": "docker-compose -f ./deployment/docker/docker-compose-build.yaml push"
+    "push": "docker-compose -f ./deployment/docker/docker-compose-build.yaml push",
+    "apply-deployments": "find ./deployment/k8s/ -name '*deployment.yaml' -exec bash -c \"kubectl apply -f {}\" \\;",
+    "rollout": "kubectl rollout restart deployment/backend-user && kubectl rollout restart deployment/backend-feed && kubectl rollout restart deployment/backend-filter && kubectl rollout restart deployment/frontend && kubectl rollout restart deployment/reverseproxy"
   },
   "repository": {
     "type": "git",
